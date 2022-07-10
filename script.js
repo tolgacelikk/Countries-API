@@ -17,32 +17,24 @@ const countriesContainer=document.querySelector('.countries')
           countriesContainer.insertAdjacentHTML('beforeend', html);
           countriesContainer.style.opacity = 1;
   }
-  const whereAmI=function(lat,lng){
+  const getCountryData=function(country){
+  fetch(`https://restcountries.com/v2/name/${country}`)
+  .then(function(response){
+    console.log(response)
+    return response.json()
+  })
+  .then(function(data){
+    console.log(data)
+    rendercountry(data[0])
+    const neighbour=data[0].borders[0]
+    return fetch(`https://restcountries.com/v2/alpha/${neighbour}`)
+    
    
-    fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
-   .then(res=> {
-       if(!res.ok){
-           throw new Error(`Problem with Geocoding ${res.status}`);
-       }
-       return res.json()
-   }
-   )
-       
-    .then(data=>{
-       console.log(data)
-       console.log(`You are in ${data.city},${data.country}`)
-       return fetch(`https://restcountries.com/v2/name/${data.country}`)
-       
-       
-    })
-    .then(response=>{
-      if(!response.ok)
-      throw new Error(`Country not found ${response.status}`)
-      return response.json()
+  })
+  .then(response=> response.json())
+    .then(data=> rendercountry(data,'neighbour'))
+ 
+}
+getCountryData('portugal') 
 
-    })
-    .then(data=>rendercountry(data[0]))
-    .catch(err=>console.log(`${err.message}`))
 
-  }
-  whereAmI(52.508,13.381)
